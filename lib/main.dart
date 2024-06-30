@@ -41,7 +41,7 @@ class TodoList extends StatefulWidget {
 
 
 class _TodoListState extends State<TodoList> {
-  final TextEditingController _textController = TextEditingController(text: 'todo-item');
+  final TextEditingController _textController = TextEditingController(text: 'new-todo-item');
   
   @override
   Widget build(BuildContext context) {
