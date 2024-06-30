@@ -1,6 +1,8 @@
 // Step 1: Ensure provider is added in pubspec.yaml
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/retrofit/api.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -18,7 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Todo app',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -39,14 +41,30 @@ class TodoList extends StatefulWidget {
   _TodoListState createState() => _TodoListState();
 }
 
-
 class _TodoListState extends State<TodoList> {
   final TextEditingController _textController = TextEditingController(text: 'new-todo-item');
   
   @override
-  Widget build(BuildContext context) {
-    TodoListModel model = Provider.of<TodoListModel>(context, listen: true);
+  void initState() {
+    final TodoListModel model = Provider.of<TodoListModel>(context, listen: false);
+    
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _initTodoItems(model);
+    });
+    super.initState();
+  }
 
+  _initTodoItems(TodoListModel model) async {
+    final client = TodoApiClient(Dio());
+    final response = await client.getTodos();
+    
+    model.setTodoItems(response.todos.map((x) => x.todo).toList());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final TodoListModel model = Provider.of<TodoListModel>(context, listen: true);
+    
     return Column(
       children: <Widget>[
         Padding(
@@ -94,5 +112,14 @@ class TodoListModel extends ChangeNotifier {
       _todos.add(item);
       notifyListeners();
     }
+  }
+
+  void setTodoItems(List<String> items) {
+    for(var item in items) {
+      if (item.isNotEmpty) {
+        _todos.add(item);
+      }
+    }
+    notifyListeners();
   }
 }
