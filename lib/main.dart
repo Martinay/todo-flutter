@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/retrofit/api.dart';
 import 'package:provider/provider.dart';
 
+import 'model/todo.dart';
+
 void main() {
   runApp(
     ChangeNotifierProvider(
@@ -61,6 +63,12 @@ class _TodoListState extends State<TodoList> {
     model.setTodoItems(response.todos.map((x) => x.todo).toList());
   }
 
+  _saveTodo(String todo) async {
+    final client = TodoApiClient(Dio());
+    final response = await client.addTodo(Todo(todo: todo, completed: true, id: 0, userId: 123));
+    return response;
+  }
+
   @override
   Widget build(BuildContext context) {
     final TodoListModel model = Provider.of<TodoListModel>(context, listen: true);
@@ -75,6 +83,7 @@ class _TodoListState extends State<TodoList> {
               hintText: 'Enter a to-do item',
             ),
             onSubmitted: (value) {
+              _saveTodo(value); // not awaited
               Provider.of<TodoListModel>(context, listen: false).addTodoItem(value);
             },
           ),
