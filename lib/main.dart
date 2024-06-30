@@ -45,6 +45,7 @@ class TodoList extends StatefulWidget {
 
 class _TodoListState extends State<TodoList> {
   final TextEditingController _textController = TextEditingController(text: 'new-todo-item');
+  final client = TodoApiClient(Dio());
   
   @override
   void initState() {
@@ -57,14 +58,12 @@ class _TodoListState extends State<TodoList> {
   }
 
   _initTodoItems(TodoListModel model) async {
-    final client = TodoApiClient(Dio());
     final response = await client.getTodos();
     
     model.setTodoItems(response.todos.map((x) => x.todo).toList());
   }
 
   _saveTodo(String todo) async {
-    final client = TodoApiClient(Dio());
     final response = await client.addTodo(Todo(todo: todo, completed: true, id: 0, userId: 123));
     return response;
   }
